@@ -1,7 +1,7 @@
 // app/layout.tsx
 import { Box, Stack } from "@chakra-ui/react";
 import { Providers } from "./providers";
-import SmallWithLogoLeft from "../../public/footer";
+import SimpleSidebar from "../../public/simpleSidebar";
 
 export default function RootLayout({
   children,
@@ -12,7 +12,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          {children}
+          <SimpleSidebar>
+            {children}
+          </SimpleSidebar>
         </Providers>
       </body>
     </html>
