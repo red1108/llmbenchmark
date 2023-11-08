@@ -18,7 +18,7 @@ export default function PageLayout({
     }
     const pathname = usePathname()
     return (
-        <Stack>
+        <Stack h="100vh">
             <HStack
                 borderBottom="1px"
                 borderBottomColor={useColorModeValue('gray.200', 'gray.700')}

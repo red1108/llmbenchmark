@@ -78,7 +78,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       pos="fixed"
       h="full"
       {...rest}>
-      <Flex h="20" mx="8" mt="30px" justifyContent="space-between" flexDir='column' mb="50px">
+      <Flex h="120px" mx="8" mt="30px" justifyContent="space-between" flexDir='column' mb="50px">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
           KoValT
         </Text>
