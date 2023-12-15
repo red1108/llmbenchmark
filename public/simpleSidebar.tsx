@@ -131,6 +131,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
           bg: 'cyan.400',
           color: 'white',
         }}
+        fontFamily="monospace"
         {...rest}>
         {icon && (
           <Icon
