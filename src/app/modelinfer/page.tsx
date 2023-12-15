@@ -10,6 +10,7 @@ import {
   Spacer,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import { ChatIcon } from "@chakra-ui/icons";
@@ -73,30 +74,31 @@ const modelNameAPIMapper: {[id:string]:string} = {
     "GPT-4": "gpt-4"
 }
 
-const inferOpenAI = (modelName: string, question: string) => {
-
-  const data = JSON.stringify({
-    model: modelName,
-    messages: [
-      { role: "system", content: "" },
-      { role: "user", content: question },
-    ],
-  });
-
-  return fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization:
-        "Bearer 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", //+process.env.OPENAI_API_KEY,
-    },
-    body: data,
-  }).then((response) => response.json());
-};
-
 export default function Page() {
+  const toast = useToast()
   const inputRef = useRef<HTMLInputElement | null>(null)
   const [result, setResult] = useState<ModelResultType[]>(initialModelResult);
+
+  const inferOpenAI = (modelName: string, question: string) => {
+
+    const data = JSON.stringify({
+      model: modelName,
+      messages: [
+        { role: "system", content: "" },
+        { role: "user", content: question },
+      ],
+    });
+  
+    return fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization:
+          "Bearer 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", //+process.env.OPENAI_API_KEY,
+      },
+      body: data,
+    }).then((response) => response.json()).catch(error => toast({ description: error }));
+  };
 
   const handleSubmit = (event:any) => {
     if(inputRef == null || inputRef.current == null) return;
@@ -108,7 +110,16 @@ export default function Page() {
         result[i].status = false;
         result[i].result = "ㅤ"
     }
+
     setResult(result);
+
+    
+    toast({
+      description: 'Request successfully submitted',
+      status: 'success',
+      duration: 2000,
+      isClosable: true,
+    });
 
     for(let i=0; i<result.length; i++) {
         if(result[i].modelName === "gpt-3.5-turbo" || result[i].modelName === "GPT-4") {
