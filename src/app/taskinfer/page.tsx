@@ -4,6 +4,7 @@ import { Stack, InputGroup, Text, Select, Spacer, Button, HStack } from "@chakra
 import PageLayout from "../../../public/pageLayout";
 import ModelResultWithScore from "../../../public/modelResultWithScore";
 import { BsTelegram } from "react-icons/bs";
+import { useState } from "react";
 
 type ModelResultWithScoreType = {
     modelName: string;
@@ -53,7 +54,50 @@ const datas: ModelResultWithScoreType[] = [
     }
 ]
 
+type TaskType = {
+    taskName: string;
+    taskId: string;
+    taskSize: number; // number of tasks
+};
+const task_names: TaskType[] = [{
+    taskName: "ko_quiz_1",
+    taskId: "ko_quiz_1",
+    taskSize: 1515,
+}, {
+    taskName: "ko_quiz_2",
+    taskId: "ko_quiz_2",
+    taskSize: 185,
+}, {
+    taskName: "ko_quiz_3",
+    taskId: "ko_quiz_3",
+    taskSize: 122,
+}, {
+    taskName: "natural language inference",
+    taskId: "nli",
+    taskSize: 999,
+}, {
+    taskName: "korean to number",
+    taskId: "number_1",
+    taskSize: 999,
+}]
+
+const handleTaskSelect = (e: React.ChangeEvent<HTMLSelectElement>, setTaskSize: any) => {
+    console.log(e.target.value);
+    for(let i=0; i<task_names.length; i++) {
+        if(task_names[i].taskId === e.target.value) {
+            setTaskSize(task_names[i].taskSize);
+            break;
+        }
+    }
+}
+
 export default function Page() {
+    
+
+  const [taskSize, setTaaskSize] = useState<number>(task_names[0].taskSize);
+
+  /* useEffect 써서 초기 데이터 불러오기 */
+
     return (
         <PageLayout>
             <Stack p="50px" h="100vh">
@@ -64,18 +108,22 @@ export default function Page() {
                 </HStack>
                 <ModelResultWithScore datas={datas} />
                 <InputGroup position="fixed" mt="calc(100vh - 200px)" w="calc(73vw - 100px)">
-                    <Select placeholder='테스크 분류 선택' w="400px">
-                        <option value='option1'>Option 1</option>
-                        <option value='option2'>Option 2</option>
-                        <option value='option3'>Option 3</option>
+                    <Select placeholder={task_names[0].taskName} w="400px" onChange={(e:any) => handleTaskSelect(e, setTaaskSize)}>
+                        {task_names.slice(1).map((entry) => {
+                            return (
+                                <option value={entry.taskId} key={entry.taskId}>{entry.taskName}</option>
+                            )
+                        })}
                     </Select>
                     <Spacer />
-                    <Select placeholder='테스크 선택' w="400px">
-                        <option value='option1'>Option 1</option>
-                        <option value='option2'>Option 2</option>
-                        <option value='option3'>Option 3</option>
+                    <Select placeholder={"0"} w="400px">
+                        {[...Array(taskSize)].map((_, i) => {
+                            return (
+                                <option value={i} key={i}>{i}</option>
+                            )
+                        })}
                     </Select>
-                    <Spacer/>
+                    <Spacer />
                     <Button rightIcon={<BsTelegram />} colorScheme='teal' variant='outline'>
                         Submit
                     </Button>
