@@ -1,6 +1,6 @@
 'use client'
 // `app/taskinfer/page.tsx` is the UI for the `/taskinfer` URL
-import { Stack, InputGroup, Text, Select, Spacer, Button, HStack } from "@chakra-ui/react";
+import { Stack, InputGroup, Text, Select, Spacer, Button, HStack, useToast } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import ModelResultWithScore from "../../../public/modelResultWithScore";
 import { BsTelegram } from "react-icons/bs";
@@ -81,22 +81,37 @@ const task_names: TaskType[] = [{
     taskSize: 999,
 }]
 
-const handleTaskSelect = (e: React.ChangeEvent<HTMLSelectElement>, setTaskSize: any) => {
-    console.log(e.target.value);
-    for(let i=0; i<task_names.length; i++) {
-        if(task_names[i].taskId === e.target.value) {
-            setTaskSize(task_names[i].taskSize);
-            break;
-        }
-    }
-}
+
 
 export default function Page() {
     
 
-  const [taskSize, setTaaskSize] = useState<number>(task_names[0].taskSize);
+    const [taskName, setTaskName] = useState<string>(task_names[0].taskName);
+    const [taskSize, setTaskSize] = useState<number>(task_names[0].taskSize);
+    const toast = useToast()
+    
+    /* useEffect 써서 초기 데이터 불러오기 */
 
-  /* useEffect 써서 초기 데이터 불러오기 */
+    const handleTaskSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log(e.target.value);
+        for(let i=0; i<task_names.length; i++) {
+            if(task_names[i].taskId === e.target.value) {
+                setTaskName(task_names[i].taskName)
+                setTaskSize(task_names[i].taskSize);
+                break;
+            }
+        }
+    }
+
+    const handlesubmit = () => {
+        toast({
+            title: 'Request error',
+            description: `Cannot fetch ${taskName} data from server`,
+            status: 'warning',
+            duration: 3000,
+            isClosable: true,
+        });
+    }
 
     return (
         <PageLayout>
@@ -108,7 +123,7 @@ export default function Page() {
                 </HStack>
                 <ModelResultWithScore datas={datas} />
                 <InputGroup position="fixed" mt="calc(100vh - 200px)" w="calc(73vw - 100px)">
-                    <Select placeholder={task_names[0].taskName} w="400px" onChange={(e:any) => handleTaskSelect(e, setTaaskSize)}>
+                    <Select placeholder={taskName} w="450px" onChange={(e:any) => handleTaskSelect(e)}>
                         {task_names.slice(1).map((entry) => {
                             return (
                                 <option value={entry.taskId} key={entry.taskId}>{entry.taskName}</option>
@@ -116,15 +131,15 @@ export default function Page() {
                         })}
                     </Select>
                     <Spacer />
-                    <Select placeholder={"0"} w="400px">
-                        {[...Array(taskSize)].map((_, i) => {
+                    <Select placeholder={"0"} w="250px" maxW="15vw">
+                        {[...Array(taskSize-1)].map((_, i) => {
                             return (
-                                <option value={i} key={i}>{i}</option>
+                                <option value={i+1} key={i+1}>{i+1}</option>
                             )
                         })}
                     </Select>
                     <Spacer />
-                    <Button rightIcon={<BsTelegram />} colorScheme='teal' variant='outline'>
+                    <Button rightIcon={<BsTelegram />} colorScheme='teal' variant='outline' onClick={handlesubmit}>
                         Submit
                     </Button>
                 </InputGroup>
