@@ -95,10 +95,11 @@ const inferOpenAI = (modelName: string, question: string) => {
 };
 
 export default function Page() {
-  const inputRef = useRef();
+  const inputRef = useRef<HTMLInputElement | null>(null)
   const [result, setResult] = useState<ModelResultType[]>(initialModelResult);
 
   const handleSubmit = (event:any) => {
+    if(inputRef == null || inputRef.current == null) return;
     const msg = inputRef.current.value;
     inputRef.current.value = "";
 
