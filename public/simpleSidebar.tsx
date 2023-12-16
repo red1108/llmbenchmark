@@ -22,6 +22,7 @@ import { IconType } from 'react-icons'
 import { ReactText } from 'react'
 import { useRouter } from 'next/navigation'
 import { BsChatLeftTextFill, BsDiagram3Fill, BsLightbulbFill, BsTrophyFill, BsUiChecksGrid } from 'react-icons/bs'
+import { MdDashboard } from 'react-icons/md'
 
 interface LinkItemProps {
   name: string
@@ -33,6 +34,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Test the Models', icon: BsChatLeftTextFill },
   { name: 'The Models', icon: BsLightbulbFill },
   { name: 'The Tasks', icon: BsDiagram3Fill },
+  { name: 'Dashboard', icon: MdDashboard },
 ]
 
 export default function SimpleSidebar({
@@ -111,6 +113,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   else if(children === 'Test the Models') linkstr = 'modelinfer'
   else if(children === 'The Models') linkstr = 'models'
   else if(children === 'The Tasks') linkstr = 'tasks'
+  else if(children === 'Dashboard') linkstr = 'dashboard'
 
 
   return (

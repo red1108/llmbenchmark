@@ -2,6 +2,7 @@
 import { Button, HStack, Icon, Spacer, Stack, Text, useColorModeValue } from "@chakra-ui/react";
 import { BiHelpCircle } from "react-icons/bi";
 import { usePathname } from 'next/navigation'
+import { MdDashboard } from "react-icons/md";
 import { BsChatLeftTextFill, BsDiagram3Fill, BsLightbulbFill, BsTrophyFill, BsUiChecksGrid } from 'react-icons/bs'
 
 export default function PageLayout({
@@ -14,7 +15,8 @@ export default function PageLayout({
         '/taskinfer': {title: 'Test the Tasks', icon: BsUiChecksGrid},
         '/modelinfer': {title: 'Test the Models', icon: BsChatLeftTextFill},
         '/models': {title: 'The Models', icon: BsLightbulbFill},
-        '/tasks': {title: 'The Tasks', icon: BsDiagram3Fill}
+        '/tasks': {title: 'The Tasks', icon: BsDiagram3Fill},
+        '/dashboard': {title: 'Dashboard', icon: MdDashboard}
     }
     const pathname = usePathname()
     return (
