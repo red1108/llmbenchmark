@@ -5,7 +5,7 @@ type ModelResultWithScoreType = {
     badgeColor: string;
     result: string;
     score: number;
-    status: boolean;
+    ready: boolean;
 };
 
 const getColor = (score: number) => {
@@ -24,12 +24,12 @@ export default function ModelResultWithScore({datas}: {datas: ModelResultWithSco
                 const meta: any = entry.badgeColor
                 return (
                     <HStack spacing="20px" key={entry.modelName} fontFamily="monospace">
-                        <Badge colorScheme={entry.badgeColor} p="5px" w="130px" maxW="130px" textAlign="center">{entry.modelName}</Badge>
-                        {entry.status ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px" >{entry.result}</Text>
+                        <Badge colorScheme={entry.badgeColor} p="5px" w="160px" maxW="160px" textAlign="center">{entry.modelName}</Badge>
+                        {entry.ready ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px" >{entry.result}</Text>
                             : <Skeleton w="full">
                                 <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
                             </Skeleton>}
-                        {entry.status ? <Badge colorScheme={getColor(entry.score)} p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">{entry.score}</Badge>
+                        {entry.ready ? <Badge colorScheme={getColor(entry.score)} p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">{entry.score}</Badge>
                             : <Skeleton w="fit" p={0}>
                                 <Badge colorScheme="blue" p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">{entry.score}</Badge>
                             </Skeleton>}

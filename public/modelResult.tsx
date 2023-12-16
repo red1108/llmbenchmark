@@ -4,7 +4,7 @@ type ModelResultType = {
     modelName: string;
     badgeColor: string;
     result: string;
-    status: boolean;
+    ready: boolean;
 };
 
 export default function ModelResult({datas}: {datas: ModelResultType[]} ) {
@@ -15,8 +15,8 @@ export default function ModelResult({datas}: {datas: ModelResultType[]} ) {
                 const meta: any = entry.badgeColor
                 return (
                     <HStack spacing="20px" key={entry.modelName} fontFamily="monospace">
-                        <Badge colorScheme={entry.badgeColor} p="5px" w="130px" maxW="130px" textAlign="center">{entry.modelName}</Badge>
-                        {entry.status ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
+                        <Badge colorScheme={entry.badgeColor} p="5px" w="160px" maxW="160px" textAlign="center">{entry.modelName}</Badge>
+                        {entry.ready ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
                             : <Skeleton w="full">
                                 <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
                             </Skeleton>}

@@ -11,7 +11,7 @@ type ModelResultWithScoreType = {
     badgeColor: string;
     result: string;
     score: number;
-    status: boolean;
+    ready: boolean;
 };
 
 const datas: ModelResultWithScoreType[] = [
@@ -20,37 +20,37 @@ const datas: ModelResultWithScoreType[] = [
         badgeColor: "blue",
         result: "안녕하세요 제 이름은 Chat GPT입니다.",
         score: 81.2,
-        status: true,
+        ready: true,
     }, {
         modelName: "Chat GPT(4)",
         badgeColor: "green",
         result: "안녕하세요 제 이름은 Chat GPT입니다.",
         score: 89.2,
-        status: true,
+        ready: true,
     }, {
         modelName: "KoGPT",
         badgeColor: "red",
         result: "안녕하세요 제 이름은 KoGPT 입니다.",
         score: 51.9,
-        status: true,
+        ready: true,
     }, {
         modelName: "ko-alpaca",
         badgeColor: "purple",
         result: "안녕! 내 이름은 ko-alphaca야.",
         score: 48.0,
-        status: true,
+        ready: true,
     }, {
         modelName: "ko-vicuna",
         badgeColor: "gray",
         result: "pending...",
         score: 0,
-        status: false,
+        ready: false,
     }, {
         modelName: "polyglot-ko",
         badgeColor: "pink",
         result: "pending...",
         score: 0,
-        status: false,
+        ready: false,
     }
 ]
 

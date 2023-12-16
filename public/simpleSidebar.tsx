@@ -57,7 +57,7 @@ export default function SimpleSidebar({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: "27vw" }} p={0}>
+      <Box ml={{ base: 0, md: "24vw" }} p={0}>
         {children}
       </Box>
     </Box>
@@ -74,7 +74,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: '27vw' }}
+      w={{ base: 'full', md: '24vw' }}
       pos="fixed"
       h="full"
       {...rest}>
