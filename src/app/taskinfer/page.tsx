@@ -1,10 +1,11 @@
 'use client'
 // `app/taskinfer/page.tsx` is the UI for the `/taskinfer` URL
-import { Stack, InputGroup, Text, Select, Spacer, Button, HStack, useToast } from "@chakra-ui/react";
+import { Stack, InputGroup, Text, Select, Spacer, Button, HStack, useToast, Box } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import ModelResultWithScore from "../../../public/modelResultWithScore";
 import { BsTelegram } from "react-icons/bs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import * as Papa from 'papaparse';
 
 type ModelResultWithScoreType = {
     modelName: string;
@@ -54,6 +55,20 @@ const datas: ModelResultWithScoreType[] = [
     }
 ]
 
+const modelNameMapper: {[key:string]:string} = {
+    "gpt-3.5-turbo": "gpt-3.5-turbo",
+    "kullm5.8b": "kullm-5.8b",
+    "kullm12.8b": "kullm-12.8b",
+    "llama2_13b": "llama2-ko-13b"
+}
+
+const badgeColorMapper: {[key:string]:string} = {
+    "gpt-3.5-turbo": "blue",
+    "kullm5.8b": "green",
+    "kullm12.8b": "red",
+    "llama2_13b": "purple"
+}
+
 type TaskType = {
     taskName: string;
     taskId: string;
@@ -85,12 +100,42 @@ const task_names: TaskType[] = [{
 
 export default function Page() {
     
-
+    const [resultStatus, setResultStatus] = useState<ModelResultWithScoreType[]>(datas);
+    const [prompt, setPrompt] = useState<string>("예시 프롬프트");
     const [taskName, setTaskName] = useState<string>(task_names[0].taskName);
+    const [taskNumber, setTaskNumber] = useState<number>(0);
     const [taskSize, setTaskSize] = useState<number>(task_names[0].taskSize);
     const toast = useToast()
     
     /* useEffect 써서 초기 데이터 불러오기 */
+    const updateResult = () => {
+        Papa.parse("/result.csv", {
+            download: true,
+            complete: function(results: {data:Array<Array<string>>}) {
+                const newResult : ModelResultWithScoreType[]= [];
+                let flag = false;
+                for(let i=0; i<results.data.length; i++) {
+                    if(results.data[i][0] === taskName && results.data[i][1] === ""+taskNumber) {
+                        newResult.push({
+                            modelName: modelNameMapper[results.data[i][2]],
+                            badgeColor: badgeColorMapper[results.data[i][2]],
+                            result: results.data[i].slice(4, results.data[i].length-2).join(""),
+                            score: Number(results.data[i][results.data[i].length-1]),
+                            ready: true,
+                        });
+                        if(!flag) {
+                            flag = true;
+                            setPrompt(results.data[i][3]);
+                        }
+                    }
+                }
+                setResultStatus(newResult);
+            }
+        });
+    }
+    useEffect(() => {
+        updateResult();
+    }, [])
 
     const handleTaskSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
         console.log(e.target.value);
@@ -105,12 +150,12 @@ export default function Page() {
 
     const handlesubmit = () => {
         toast({
-            title: 'Request error',
-            description: `Cannot fetch ${taskName} data from server`,
-            status: 'warning',
-            duration: 3000,
-            isClosable: true,
+            description: `${taskName}/${taskNumber} fetching successful`,
+            status: 'success',
+            duration: 1000
         });
+        updateResult();
+
     }
 
     return (
@@ -121,7 +166,13 @@ export default function Page() {
                     <Text w="full" textAlign="center">Model output</Text>
                     <Text p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">Score</Text>
                 </HStack>
-                <ModelResultWithScore datas={datas} />
+                <ModelResultWithScore datas={resultStatus} />
+                <Stack mt="350px" fontFamily="monospace">
+                    <Text fontSize="lg" fontWeight="bold">Task Prompt</Text>
+                    <Box p="20px" bg="gray.900" borderRadius="5px" textColor="white" h="200px">
+                        {prompt}
+                    </Box>
+                </Stack>
                 <InputGroup position="fixed" mt="calc(100vh - 200px)" w="calc(73vw - 100px)">
                     <Select placeholder={taskName} w="450px" onChange={(e:any) => handleTaskSelect(e)}>
                         {task_names.slice(1).map((entry) => {
@@ -131,7 +182,7 @@ export default function Page() {
                         })}
                     </Select>
                     <Spacer />
-                    <Select placeholder={"0"} w="250px" maxW="15vw">
+                    <Select placeholder="0" w="250px" maxW="15vw" onChange={(e:any) => {e.preventDefault(); console.log(e.target.value);setTaskNumber(Number(e.target.value));}}>
                         {[...Array(taskSize-1)].map((_, i) => {
                             return (
                                 <option value={i+1} key={i+1}>{i+1}</option>
