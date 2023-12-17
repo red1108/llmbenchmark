@@ -124,10 +124,14 @@ export default function Page() {
       body: data,
     })
       .then((response) => response.json())
-      .catch((error) => toast({ description: error }));
+      .catch((error) =>  {
+          toast({ description: "polaris.snu.ac.kr:8123 model nlpai-lab/kullm-polyglot-5.8b-v2 not found", status:"error"});
+        }
+      );
   };
 
   const handleSubmit = (event: any) => {
+    event.preventDefault();
     if (inputRef == null || inputRef.current == null) return;
     const msg = inputRef.current.value;
     inputRef.current.value = "";
@@ -147,7 +151,7 @@ export default function Page() {
       duration: 2000,
       isClosable: true,
     });
-
+    
     for (let i = 0; i < result.length; i++) {
       if (
         result[i].modelName === "gpt-3.5-turbo" ||
@@ -158,7 +162,7 @@ export default function Page() {
             let newResult = [...result];
             newResult[i].result = res.choices[0].message.content;
             newResult[i].ready = true;
-            setResult(newResult);
+            //setResult(newResult);
           })
           .catch((error) => console.log("openai error : ", error));
       } else if (result[i].modelName === "kullm-5.8b") {
@@ -168,13 +172,12 @@ export default function Page() {
             console.log(res.choices[0].text);
             newResult[i].result = res.choices[0].text;
             newResult[i].ready = true;
-            setResult(newResult);
+            console.log("alive");
           })
           .catch((error) => console.log("kullm error : ", error));
       }
     }
 
-    event.preventDefault();
   };
 
   return (
