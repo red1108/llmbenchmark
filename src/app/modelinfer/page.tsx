@@ -99,7 +99,7 @@ export default function Page() {
       headers: {
         "content-type": "application/json",
         Authorization:
-          "Bearer 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", //+process.env.OPENAI_API_KEY,
+          "Bearer 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", //+process.env.OPENAI_API_KEY,
       },
       body: data,
     })
