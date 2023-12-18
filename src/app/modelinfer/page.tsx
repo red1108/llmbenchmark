@@ -10,6 +10,7 @@ import {
   Spacer,
   Stack,
   Text,
+  useToast,
 } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import { ChatIcon } from "@chakra-ui/icons";
@@ -20,108 +21,162 @@ type ModelResultType = {
   modelName: string;
   badgeColor: string;
   result: string;
-  status: boolean;
+  ready: boolean;
 };
 
-const initialModelResult: ModelResultType[] = [ 
+const initialModelResult: ModelResultType[] = [
   {
     modelName: "GPT-3",
     badgeColor: "blue",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
   {
     modelName: "gpt-3.5-turbo",
     badgeColor: "blue",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
   {
     modelName: "GPT-4",
     badgeColor: "green",
     result: "ㅤ",
-    status: true,
+    ready: true,
+  },
+  {
+    modelName: "kullm-5.8b",
+    badgeColor: "orange",
+    result: "ㅤ",
+    ready: true,
   },
   {
     modelName: "KoGPT",
     badgeColor: "red",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
   {
     modelName: "ko-alpaca",
     badgeColor: "purple",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
   {
     modelName: "ko-vicuna",
     badgeColor: "gray",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
   {
     modelName: "polyglot-ko",
     badgeColor: "pink",
     result: "ㅤ",
-    status: true,
+    ready: true,
   },
 ];
 
-const modelNameAPIMapper: {[id:string]:string} = {
-    "gpt-3.5-turbo": "gpt-3.5-turbo",
-    "GPT-4": "gpt-4"
-}
-
-const inferOpenAI = (modelName: string, question: string) => {
-
-  const data = JSON.stringify({
-    model: modelName,
-    messages: [
-      { role: "system", content: "" },
-      { role: "user", content: question },
-    ],
-  });
-
-  return fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "content-type": "application/json",
-      Authorization:
-        "Bearer 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", //+process.env.OPENAI_API_KEY,
-    },
-    body: data,
-  }).then((response) => response.json());
+const modelNameAPIMapper: { [id: string]: string } = {
+  "gpt-3.5-turbo": "gpt-3.5-turbo",
+  "GPT-4": "gpt-4",
 };
 
 export default function Page() {
-  const inputRef = useRef();
+  const toast = useToast();
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const [result, setResult] = useState<ModelResultType[]>(initialModelResult);
 
-  const handleSubmit = (event:any) => {
+  const inferOpenAI = (modelName: string, question: string) => {
+    const data = JSON.stringify({
+      model: modelName,
+      messages: [
+        { role: "system", content: "" },
+        { role: "user", content: question },
+      ],
+    });
+
+    return fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+        Authorization:
+          "Bearer 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", //+process.env.OPENAI_API_KEY,
+      },
+      body: data,
+    })
+      .then((response) => response.json())
+      .catch((error) => toast({ description: error }));
+  };
+
+  const inferKullm = (prompt: string) => {
+    const data = JSON.stringify({
+      model: "nlpai-lab/kullm-polyglot-5.8b-v2",
+      prompt:
+        `아래는 작업을 설명하는 명령어입니다. 요청을 적절히 완료하는 응답을 작성하세요.\n\n### 명령어:\n${prompt}\n\n### 응답:\n`,
+      max_tokens: 1024,
+      temperature: 0,
+    });
+
+    return fetch("http://polaris.snu.ac.kr:8123/v1/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json"
+      },
+      body: data,
+    })
+      .then((response) => response.json())
+      .catch((error) =>  {
+          toast({ description: "polaris.snu.ac.kr:8123 model nlpai-lab/kullm-polyglot-5.8b-v2 not found", status:"error"});
+        }
+      );
+  };
+
+  const handleSubmit = (event: any) => {
+    event.preventDefault();
+    if (inputRef == null || inputRef.current == null) return;
     const msg = inputRef.current.value;
     inputRef.current.value = "";
 
+    let newResult = [...result];
+
+    for (let i = 0; i < result.length; i++) {
+      newResult[i].ready = false;
+      newResult[i].result = "ㅤ";
+    }
+
+    setResult(newResult);
+
+    toast({
+      description: "Request successfully submitted",
+      status: "success",
+      duration: 2000,
+      isClosable: true,
+    });
     
-    for(let i=0; i<result.length; i++) {
-        result[i].status = false;
-        result[i].result = "ㅤ"
+    for (let i = 0; i < result.length; i++) {
+      if (
+        result[i].modelName === "gpt-3.5-turbo" ||
+        result[i].modelName === "GPT-4"
+      ) {
+        inferOpenAI(modelNameAPIMapper[result[i].modelName], msg)
+          .then((res) => {
+            let newResult = [...result];
+            newResult[i].result = res.choices[0].message.content;
+            newResult[i].ready = true;
+            //setResult(newResult);
+          })
+          .catch((error) => console.log("openai error : ", error));
+      } else if (result[i].modelName === "kullm-5.8b") {
+        inferKullm(msg)
+          .then((res) => {
+            let newResult = [...result];
+            console.log(res.choices[0].text);
+            newResult[i].result = res.choices[0].text;
+            newResult[i].ready = true;
+            console.log("alive");
+          })
+          .catch((error) => console.log("kullm error : ", error));
+      }
     }
-    setResult(result);
-
-    for(let i=0; i<result.length; i++) {
-        if(result[i].modelName === "gpt-3.5-turbo" || result[i].modelName === "GPT-4") {
-            inferOpenAI(modelNameAPIMapper[result[i].modelName], msg)
-            .then(res => {
-                let newresult = [...result];
-                newresult[i].result = res.choices[0].message.content;
-                newresult[i].status = true
-                setResult(newresult);
-            }).catch(error => console.log('error : ', error));
-        }
-    }
-
-    event.preventDefault();
 
   };
 

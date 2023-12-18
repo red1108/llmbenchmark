@@ -1,13 +1,22 @@
 import { Stack, HStack, Badge, Skeleton, Text } from "@chakra-ui/react"
 
-type ModelResultType = {
+type ModelResultWithScoreType = {
     modelName: string;
     badgeColor: string;
     result: string;
+    score: number;
     ready: boolean;
 };
 
-export default function ModelResult({datas}: {datas: ModelResultType[]} ) {
+const getColor = (score: number) => {
+    if (score >= 80) return "green";
+    else if(score >= 60) return "blue"
+    else if(score >= 40) return "yellow";
+    else if(score >= 20) return "orange";
+    else return "red";
+}
+
+export default function ModelResultWithScore({datas}: {datas: ModelResultWithScoreType[]} ) {
     return (
         <Stack>
             {datas.map((entry) => {
@@ -16,9 +25,13 @@ export default function ModelResult({datas}: {datas: ModelResultType[]} ) {
                 return (
                     <HStack spacing="20px" key={entry.modelName} fontFamily="monospace">
                         <Badge colorScheme={entry.badgeColor} p="5px" w="160px" maxW="160px" textAlign="center">{entry.modelName}</Badge>
-                        {entry.ready ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
+                        {entry.ready ? <Text borderRadius="5px" bg="gray.100" w="full" p="5px" >{entry.result}</Text>
                             : <Skeleton w="full">
                                 <Text borderRadius="5px" bg="gray.100" w="full" p="5px">{entry.result}</Text>
+                            </Skeleton>}
+                        {entry.ready ? <Badge colorScheme={getColor(entry.score)} p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">{entry.score}</Badge>
+                            : <Skeleton w="fit" p={0}>
+                                <Badge colorScheme="blue" p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">{entry.score}</Badge>
                             </Skeleton>}
                     </HStack>
                 )

@@ -22,6 +22,7 @@ import { IconType } from 'react-icons'
 import { ReactText } from 'react'
 import { useRouter } from 'next/navigation'
 import { BsChatLeftTextFill, BsDiagram3Fill, BsLightbulbFill, BsTrophyFill, BsUiChecksGrid } from 'react-icons/bs'
+import { MdDashboard } from 'react-icons/md'
 
 interface LinkItemProps {
   name: string
@@ -33,6 +34,7 @@ const LinkItems: Array<LinkItemProps> = [
   { name: 'Test the Models', icon: BsChatLeftTextFill },
   { name: 'The Models', icon: BsLightbulbFill },
   { name: 'The Tasks', icon: BsDiagram3Fill },
+  { name: 'Dashboard', icon: MdDashboard },
 ]
 
 export default function SimpleSidebar({
@@ -57,7 +59,7 @@ export default function SimpleSidebar({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: "27vw" }} p={0}>
+      <Box ml={{ base: 0, md: "24vw" }} p={0}>
         {children}
       </Box>
     </Box>
@@ -74,7 +76,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: '27vw' }}
+      w={{ base: 'full', md: '24vw' }}
       pos="fixed"
       h="full"
       {...rest}>
@@ -111,6 +113,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   else if(children === 'Test the Models') linkstr = 'modelinfer'
   else if(children === 'The Models') linkstr = 'models'
   else if(children === 'The Tasks') linkstr = 'tasks'
+  else if(children === 'Dashboard') linkstr = 'dashboard'
 
 
   return (
@@ -131,6 +134,7 @@ const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
           bg: 'cyan.400',
           color: 'white',
         }}
+        fontFamily="monospace"
         {...rest}>
         {icon && (
           <Icon
