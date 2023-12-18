@@ -7,7 +7,7 @@ import {
   getCoreRowModel,
   ColumnDef,
   SortingState,
-  getSortedRowModel
+  getSortedRowModel,
 } from "@tanstack/react-table";
 
 export type DataTableProps<Data extends object> = {
@@ -17,7 +17,7 @@ export type DataTableProps<Data extends object> = {
 
 export function DataTable<Data extends object>({
   data,
-  columns
+  columns,
 }: DataTableProps<Data>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const table = useReactTable({
@@ -27,12 +27,12 @@ export function DataTable<Data extends object>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     state: {
-      sorting
-    }
+      sorting,
+    },
   });
 
   return (
-    <Table w="1000px" overflow="scroll" scrollDirection="horizontal">
+    <Table w="1000px" overflow="scroll">
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -71,11 +71,31 @@ export function DataTable<Data extends object>({
           // hover when scale animation
           <Tr key={row.id}>
             {row.getVisibleCells().map((cell) => {
-              // see https://tanstack.com/table/v8/docs/api/core/column-def#meta to type this correctly
               const meta: any = cell.column.columnDef.meta;
+              let val: string = cell.getValue() as string;
+              if (val == undefined) {
+                return (
+                  <Td
+                    key={cell.id}
+                    isNumeric={meta?.isNumeric}
+                  >
+                    {val}
+                  </Td>
+                );
+              }
+              let fontWeight = "normal";
+              console.log(val, typeof val);
+              if(val[val.length-1] == ".") {
+                val = val.substring(0, val.length-1);
+                fontWeight = "bold";
+              }
               return (
-                <Td key={cell.id} isNumeric={meta?.isNumeric}>
-                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                <Td
+                  key={cell.id}
+                  isNumeric={meta?.isNumeric}
+                  fontWeight={fontWeight}
+                >
+                  {val}
                 </Td>
               );
             })}
