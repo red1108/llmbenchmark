@@ -11,6 +11,7 @@ type UnitConversion = {
   kullm58b: number;
   kullm128b: number;
   llama2ko128b: number;
+  kovicuna128b: number;
 };
 
 const data: UnitConversion[] = [
@@ -19,98 +20,112 @@ const data: UnitConversion[] = [
     gpt35turbo: 32.5,
     kullm58b: 31.1,
     kullm128b: 35.2,
-    llama2ko128b: 38.6
+    llama2ko128b: 38.6,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_2",
     gpt35turbo: 45.2,
     kullm58b: 48.9,
     kullm128b: 41.5,
-    llama2ko128b: 53.7
+    llama2ko128b: 53.7,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_3",
     gpt35turbo: 28.7,
     kullm58b: 36.5,
     kullm128b: 32.1,
-    llama2ko128b: 29.4
+    llama2ko128b: 29.4,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_4",
     gpt35turbo: 49.3,
     kullm58b: 42.8,
     kullm128b: 47.6,
-    llama2ko128b: 50.2
+    llama2ko128b: 50.2,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_5",
     gpt35turbo: 36.8,
     kullm58b: 41.3,
     kullm128b: 39.2,
-    llama2ko128b: 44.5
+    llama2ko128b: 44.5,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_6",
     gpt35turbo: 54.1,
     kullm58b: 49.7,
     kullm128b: 52.3,
-    llama2ko128b: 58.9
+    llama2ko128b: 58.9,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "ko_quiz_7",
     gpt35turbo: 43.6,
     kullm58b: 38.4,
     kullm128b: 45.8,
-    llama2ko128b: 40.2
+    llama2ko128b: 40.2,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "number_1",
     gpt35turbo: 62.3,
     kullm58b: 59.8,
     kullm128b: 63.7,
-    llama2ko128b: 61.1
+    llama2ko128b: 61.1,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "number_2",
     gpt35turbo: 55.6,
     kullm58b: 58.9,
     kullm128b: 52.4,
-    llama2ko128b: 56.7
+    llama2ko128b: 56.7,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "number_3",
     gpt35turbo: 67.4,
     kullm58b: 70.2,
     kullm128b: 68.5,
-    llama2ko128b: 65.9
+    llama2ko128b: 65.9,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "reasoning",
     gpt35turbo: 88.1,
     kullm58b: 90.7,
     kullm128b: 87.3,
-    llama2ko128b: 89.5
+    llama2ko128b: 89.5,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "spelling_correct",
     gpt35turbo: 79.2,
     kullm58b: 82.4,
     kullm128b: 77.8,
-    llama2ko128b: 80.6
+    llama2ko128b: 80.6,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "summarization",
     gpt35turbo: 50.7,
     kullm58b: 48.3,
     kullm128b: 53.6,
-    llama2ko128b: 49.2
+    llama2ko128b: 49.2,
+    kovicuna128b: 12.2
   },
   {
     "taskName": "translation",
     gpt35turbo: 73.4,
     kullm58b: 71.8,
     kullm128b: 75.2,
-    llama2ko128b: 72.6
+    llama2ko128b: 72.6,
+    kovicuna128b: 12.2
   }
 ];
 
@@ -149,6 +164,13 @@ const columns = [
     meta: {
       isNumeric: true
     }
+  }),
+  columnHelper.accessor("kovicuna128b", {
+    cell: (info) => info.getValue(),
+    header: "ko-vicuna-12.8b",
+    meta: {
+      isNumeric: true
+    }
   })
 ];
 
@@ -175,7 +197,7 @@ export default function Home() {
   return (
     <PageLayout>
       <Stack p="30px">
-        <Box borderRadius="10px" borderColor="gray.200" borderWidth="1px" overflow="hidden">
+        <Box borderRadius="10px" borderColor="gray.200" borderWidth="1px" overflow="scroll">
           <DataTable columns={columns} data={data}/>
         </Box>
       </Stack>

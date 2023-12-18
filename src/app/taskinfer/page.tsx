@@ -59,14 +59,14 @@ const modelNameMapper: {[key:string]:string} = {
     "gpt-3.5-turbo": "gpt-3.5-turbo",
     "kullm5.8b": "kullm-5.8b",
     "kullm12.8b": "kullm-12.8b",
-    "llama2_13b": "llama2-ko-13b"
+    "llama2_13b": "llama2-ko-13b",
 }
 
 const badgeColorMapper: {[key:string]:string} = {
     "gpt-3.5-turbo": "blue",
     "kullm5.8b": "green",
     "kullm12.8b": "red",
-    "llama2_13b": "purple"
+    "llama2_13b": "purple",
 }
 
 type TaskType = {
@@ -167,7 +167,7 @@ export default function Page() {
                     <Text p="5px" w="50px" minW="50px" maxW="50px" textAlign="center">Score</Text>
                 </HStack>
                 <ModelResultWithScore datas={resultStatus} />
-                <Stack mt="350px" fontFamily="monospace">
+                <Stack mt="10vh" fontFamily="monospace">
                     <Text fontSize="lg" fontWeight="bold">Task Prompt</Text>
                     <Box p="20px" bg="gray.900" borderRadius="5px" textColor="white" h="200px">
                         {prompt}

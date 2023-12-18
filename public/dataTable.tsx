@@ -32,7 +32,7 @@ export function DataTable<Data extends object>({
   });
 
   return (
-    <Table>
+    <Table w="1000px" overflow="scroll" scrollDirection="horizontal">
       <Thead>
         {table.getHeaderGroups().map((headerGroup) => (
           <Tr key={headerGroup.id}>
@@ -44,13 +44,14 @@ export function DataTable<Data extends object>({
                   key={header.id}
                   onClick={header.column.getToggleSortingHandler()}
                   isNumeric={meta?.isNumeric}
+                  fontSize="xs"
                 >
                   {flexRender(
                     header.column.columnDef.header,
                     header.getContext()
                   )}
 
-                  <chakra.span pl="4">
+                  <chakra.span pl="2">
                     {header.column.getIsSorted() ? (
                       header.column.getIsSorted() === "desc" ? (
                         <TriangleDownIcon aria-label="sorted descending" />
