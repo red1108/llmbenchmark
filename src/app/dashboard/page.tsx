@@ -45,14 +45,14 @@ export const barOptions = {
 };
   
 const CHART_COLORS = {
-  red: "rgb(255, 99, 132)",
-  orange: "rgb(255, 159, 64)",
-  yellow: "rgb(255, 205, 86)",
-  green: "rgb(75, 192, 192)",
-  blue: "rgb(54, 162, 235)",
-  purple: "rgb(153, 102, 255)",
+  red: "RGB(255, 105, 97)",
+  orange: "RGB(255, 180, 128)",
+  yellow: "RGB(248, 243, 141)",
+  green: "RGB(66, 214, 164)",
+  blue: "RGB(89, 173, 246)",
+  purple: "RGB(157, 148, 255)",
   grey: "rgb(101, 103, 107)",
-  pink: "rgb(255, 99, 132)",
+  pink: "RGB(199, 128, 232)",
 };
 const NAMED_COLORS = [
   CHART_COLORS.red,
@@ -73,13 +73,19 @@ const Utils = {
       case 'gpt-3.5-turbo':
         return CHART_COLORS.red;
       case 'kullm5.8b':
-        return CHART_COLORS.blue;
+        return CHART_COLORS.orange;
       case 'kullm12.8b':
         return CHART_COLORS.yellow;
       case 'llama2_13b':
-        return CHART_COLORS.green;
+        return CHART_COLORS.grey;
       case 'ko_vicuna_7b':
         return CHART_COLORS.purple;
+      case 'polyglot-ko-1.3b':
+        return CHART_COLORS.pink;
+      case 'gemini-pro':
+        return CHART_COLORS.blue;
+      case 'KoAlpaca-Polyglot-5.8B':
+        return CHART_COLORS.green;
       default:
         return CHART_COLORS.grey;
     }
@@ -94,7 +100,7 @@ type Score = {
 
 export default function Page() {
   // bar chart variables
-  const [modelNames, setModelNames] = useState<string[]>(["kullm12.8b","kullm5.8b","gpt-3.5-turbo","ko_vicuna_7b","llama2_13b"]);
+  const [modelNames, setModelNames] = useState<string[]>(["kullm12.8b","kullm5.8b","gpt-3.5-turbo","ko_vicuna_7b","llama2_13b", "polyglot-ko-1.3b","gemini-pro","KoAlpaca-Polyglot-5.8B"]);
   const [taskNames, setTaskNames] = useState<string[]>(["ko_quiz_1", "ko_quiz_2","ko_quiz_3", "ko_quiz_4", "ko_quiz_5", "ko_quiz_6", "ko_quiz_7", "number_1", "number_2", "number_3", "reasoning", "spelling_correct", "summarization", "translation"]);
   const [completeData, setCompleteData] = useState<Score[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>(modelNames);
@@ -107,7 +113,11 @@ export default function Page() {
   });
 
   // radar chart variables
-  const [selectedRadarModel, setSelectedRadarModel] = useState<string>("kullm12.8b");
+  const [selectedRadarModel, setSelectedRadarModel] = useState<string>("");
+
+  // recommendation variables
+  const [selectedRecommendTask, setSelectedRecommendTask] = useState<string>("");
+
   // Data for the radar chart
   const [radarConfig, setRadarConfig] = useState({
       type: 'radar',
@@ -130,9 +140,58 @@ export default function Page() {
           line: {
             borderWidth: 3
           }
-        }
+        },
+        maintainAspectRatio: false,
       },
     });
+    // Data for the rank radar chart
+  const [rankRadarConfig, setRankRadarConfig] = useState({
+    type: "radar",
+    data: {
+      labels: taskNames,
+      datasets: [
+        {
+          label: "Model Rank",
+          data: [0, 0, 0, 0, 0, 0, 0, 0],
+          fill: true,
+          backgroundColor: Utils.chartColor(selectedRadarModel),
+          borderColor: Utils.chartColor(selectedRadarModel),
+          pointBackgroundColor: Utils.chartColor(selectedRadarModel),
+          pointBorderColor: "#fff",
+          pointHoverBackgroundColor: "#fff",
+          pointHoverBorderColor: Utils.chartColor(selectedRadarModel),
+        },
+      ],
+    },
+    options: {
+      elements: {
+        line: {
+          borderWidth: 3,
+        },
+      },
+      scales: {
+        r: {
+            angleLines: {
+                display: false
+            },
+            suggestedMin: 0,
+            suggestedMax: 10
+        }
+      },
+      maintainAspectRatio: false,
+    },
+  });
+  // Function to calculate the rank for each task
+  const calculateModelRank = (modelName: string) => {
+    const modelData = completeData.filter((item) => item.modelName === modelName);
+    const sortedData = [...modelData].sort((a, b) => b.score - a.score);
+    const ranks: number[] = [];
+    for (const task of taskNames) {
+      const rank = sortedData.findIndex((item) => item.taskName === task) + 1;
+      ranks.push(rank);
+    }
+    return ranks;
+  };
   
   const updateBarChartData = () => {
     const filteredBarChartData = selectedModels.map((model) => ({
@@ -153,7 +212,7 @@ export default function Page() {
     const filteredRadarChartData = {
       labels: taskNames,
       datasets: [{
-        label: selectedRadarModel,
+        label: "Scores",
         data: filterChartDataByModel(selectedRadarModel),
         fill: true,
         backgroundColor: Utils.chartColor(selectedRadarModel),
@@ -173,9 +232,54 @@ export default function Page() {
           line: {
             borderWidth: 3
           }
-        }
+        },
+        maintainAspectRatio: false,
       },
     });
+  };
+
+  const updateRankRadarChartData = () => {
+    const modelRank = calculateModelRank(selectedRadarModel);
+    setRankRadarConfig({
+      type: "radar",
+      data: {
+        labels: taskNames,
+        datasets: [
+          {
+            label: "Model Rank",
+            data: modelRank,
+            fill: true,
+            backgroundColor: Utils.chartColor(selectedRadarModel),
+            borderColor: Utils.chartColor(selectedRadarModel),
+            pointBackgroundColor: Utils.chartColor(selectedRadarModel),
+            pointBorderColor: "#fff",
+            pointHoverBackgroundColor: "#fff",
+            pointHoverBorderColor: Utils.chartColor(selectedRadarModel),
+          },
+        ],
+      },
+      options: {
+        elements: {
+          line: {
+            borderWidth: 3,
+          },
+        },
+        scales: {
+          r: {
+              angleLines: {
+                  display: false
+              },
+              suggestedMin: 0,
+              suggestedMax: 10
+          }
+        },
+        maintainAspectRatio: false,
+      },
+    });
+  }
+
+  const updateRecommendation = () => {
+
   }
 
   // Create a function to parse the CSV data into the desired structure
@@ -215,6 +319,23 @@ export default function Page() {
       else return -1;
     });
     return sortedData.map((item) => item.score);
+  };
+
+  // Create a function to calculate the top 3 models for a selected task
+  const getTopModelsForTask = (task: string): string[] => {
+    const modelsForTask = modelNames.filter((modelName) =>
+      completeData.some((score) => score.modelName === modelName && score.taskName === task)
+    );
+  
+    // Sort models by their scores for the selected task in descending order
+    modelsForTask.sort((a, b) => {
+      const scoreA = completeData.find((score) => score.modelName === a && score.taskName === task)?.score || 0;
+      const scoreB = completeData.find((score) => score.modelName === b && score.taskName === task)?.score || 0;
+      return scoreB - scoreA;
+    });
+  
+    // Get the top 3 models
+    return modelsForTask.slice(0, 3);
   };
 
   // Fetch the CSV data
@@ -264,6 +385,7 @@ export default function Page() {
   // Update the radar chart data when the selected model changes
   useEffect(() => {
     updateRadarChartData();
+    updateRankRadarChartData();
   }, [selectedRadarModel, completeData]);
 
   return (
@@ -271,75 +393,86 @@ export default function Page() {
       <Box p="70px">
         <Tabs colorScheme="black">
           <TabList>
-            <Tab>
-              Chart
-            </Tab>
-            <Tab>
-              Model Skills
-            </Tab>
-            <Tab>
-              Model Recommendations
-            </Tab>
-          </TabList> 
+            <Tab>Chart</Tab>
+            <Tab>Model Skills</Tab>
+          </TabList>
           <TabPanels>
             <TabPanel>
               <Stack spacing={[1, 5]} direction={['column', 'row']}>
-                {modelNames.map((modelName) => (
-                  <Checkbox
-                  defaultChecked={true}
-                  value={modelName} 
-                  key={modelName}
-                  onChange={(e) => {setSelectedModels(
-                    selectedModels.includes(modelName)
-                    ? selectedModels.filter((item) => item !== modelName)
-                    : selectedModels.concat(modelName)
-                    )}}
-                  >{modelName}</Checkbox>
-                ))}
+                <div>
+                  <strong>Model Selection:</strong>
+                  <Wrap spacing="5px">
+                    {modelNames.map((modelName) => (
+                      <Checkbox
+                        defaultChecked={true}
+                        value={modelName}
+                        key={modelName}
+                        onChange={(e) => {
+                          setSelectedModels(
+                            selectedModels.includes(modelName)
+                              ? selectedModels.filter((item) => item !== modelName)
+                              : selectedModels.concat(modelName)
+                          );
+                        }}
+                      >
+                        {modelName}
+                      </Checkbox>
+                    ))}
+                  </Wrap>
+                </div>
+                <div>
+                  <strong>Task Selection:</strong>
+                  <Wrap spacing="5px">
+                    {taskNames.map((taskName) => (
+                      <Checkbox
+                        value={taskName}
+                        defaultChecked={true}
+                        key={taskName}
+                        onChange={(e) => {
+                          setSelectedTasks(
+                            selectedTasks.includes(taskName)
+                              ? selectedTasks.filter((item) => item !== taskName)
+                              : selectedTasks.concat(taskName)
+                          );
+                        }}
+                      >
+                        {taskName}
+                      </Checkbox>
+                    ))}
+                  </Wrap>
+                </div>
               </Stack>
-              <Wrap spacing = '5px'>
-                {taskNames.map((taskName) => (
-                  <Checkbox value={taskName}
-                  defaultChecked={true}
-                  key={taskName}
-                  onChange = {(e) => {setSelectedTasks(
-                    selectedTasks.includes(taskName)
-                    ? selectedTasks.filter((item) => item !== taskName)
-                    : selectedTasks.concat(taskName)
-                    )}}
-                  >{taskName}</Checkbox>
-                ))}
-              </Wrap>
               <Bar options={barOptions} data={barChartData} />
             </TabPanel>
             <TabPanel>
-              <Select 
-              variant='flushed' 
-              placeholder='Select Model' 
-              onChange={(e) => {
-                setSelectedRadarModel(e.target.value);
-              }}>
+              <Select
+                variant="flushed"
+                placeholder="Select Model"
+                onChange={(e) => {
+                  setSelectedRadarModel(e.target.value);
+                }}
+              >
                 {modelNames.map((modelName) => (
-                  <option value={modelName} key={modelName}>{modelName}</option>
+                  <option value={modelName} key={modelName}>
+                    {modelName}
+                  </option>
                 ))}
               </Select>
-              <Radar data={radarConfig.data} options={radarConfig.options} />
+              <div style={{ display: 'flex', paddingTop: '70px' }}>
+                <div style={{ width: '550px', height: '550px' }}>
+                  <strong>Task Scores:</strong>
+                  <Radar data={radarConfig.data} options={radarConfig.options} />
+                </div>
+                <div style={{ width: '550px', height: '550px' }}>
+                  <strong>Task Ranks:</strong>
+                  <Radar data={rankRadarConfig.data} options={rankRadarConfig.options} />
+                </div>
+              </div>
             </TabPanel>
-          </TabPanels>     
+          </TabPanels>
         </Tabs>
       </Box>
     </PageLayout>
   );
+  
 }
-
-
-/** 
- * 
- * 1. Connect to source data and parse it to desired format
- * 2. Make chart responsive by task and model
- * 3. Create selections for tasks and models -> chakra ui checkboxes
- * TODO: 
- * 4. Create radar charts for each model -> task score max to 100
- * 5. Create a table for each task, recommending the top 3 models
- * 6. Create group of selections for the tasks and models for group comparison
- */
