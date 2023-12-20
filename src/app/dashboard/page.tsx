@@ -62,59 +62,25 @@ const NAMED_COLORS = [
 const Utils = {
   "CHART_COLORS": CHART_COLORS,
   "NAMED_COLORS": NAMED_COLORS,
-  // assign a color for each task
-  chartColor: (taskName: string) => {
-    switch (taskName) {
-      case 'ko_quiz_1':
+  // assign a color for each model
+  chartColor: (modelName: string) => {
+    switch (modelName) {
+      case 'gpt-3.5-turbo':
         return CHART_COLORS.red;
-      case 'ko_quiz_2':
-        return CHART_COLORS.orange;
-      case 'ko_quiz_3':
-        return CHART_COLORS.yellow;
-      case 'ko_quiz_4':
-        return CHART_COLORS.green;
-      case 'ko_quiz_5':
+      case 'kullm5.8b':
         return CHART_COLORS.blue;
-      case 'ko_quiz_6':
+      case 'kullm12.8b':
+        return CHART_COLORS.yellow;
+      case 'llama2_13b':
+        return CHART_COLORS.green;
+      case 'ko_vicuna_7b':
         return CHART_COLORS.purple;
-      case 'ko_quiz_7':
+      default:
         return CHART_COLORS.grey;
-      case 'number_1':
-        return CHART_COLORS.pink;
-      case 'number_2':
-        return CHART_COLORS.red;
-      case 'number_3':
-        return CHART_COLORS.orange;
-      case 'reasoning':
-        return CHART_COLORS.yellow;
-      case 'spelling_correct':
-        return CHART_COLORS.green;
-      case 'summarization':
-        return CHART_COLORS.blue;
-      case 'translation':
-        return CHART_COLORS.purple;
     }
   }
 };
-  
 
-export const dummyData = {
-    labels,
-    datasets: [
-      {
-        label: 'Dataset 1',
-        data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      },
-      {
-        label: 'Dataset 2',
-        data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
-        backgroundColor: 'rgba(53, 162, 235, 0.5)',
-      },
-    ],
-  };
-
-// Define types for your data
 type Score = {
     taskName: string;
     modelName: string;
@@ -135,55 +101,20 @@ export default function Page() {
     datasets:[{}],
   });
 
-  // Fetch the CSV data
-  useEffect(() => {
-    // Parse the CSV data and update state
-    fetch('/score.csv')
-      .then((response) => response.text())
-      .then((csvData) => {
-        Papa.parse(csvData, {
-          header: true,
-          dynamicTyping: true,
-          complete: (result) => {
-            // Process the parsed data (result.data) and store it in state
-            const parsedData = result.data;
-            const taskNames = Object.keys(parsedData[0] as object);
-            setTaskNames(taskNames);
-            setCompleteData(parseCsvData(parsedData as Array<Object>));
-          },
-        });
-      });
-  }, []);
-
-  // Filter the data by selected models
-  useEffect(() => {
-    console.log(selectedModels);
-    // order selected models by name
-    setSelectedModels(selectedModels.sort());
-    setFilteredData(
-      completeData.filter((item) => selectedModels.includes(item.modelName))
-    );
-    updateChart();
-  }, [selectedModels]);
-
-  // Filter the data by selected tasks
-  useEffect(() => {
-    setSelectedTasks(selectedTasks.sort());
-    setFilteredData(
-      completeData.filter((item) => selectedTasks.includes(item.taskName))
-    );
-    updateChart();
-  }, [selectedTasks]);
-
-  // Update the chart data when the filtered data changes
-  useEffect(() => {
-    updateChart();
-  }, [filteredData]);
-
-  // Set labels for the chart
-  useEffect(() => {
-    const labels = taskNames;
-  }, [taskNames]);
+  const updateChartData = () => {
+    const filteredChartData = selectedModels.map((model) => ({
+      label: model,
+      backgroundColor: Utils.chartColor(model),
+      borderColor: Utils.chartColor(model),
+      borderWidth: 1,
+      data: filterChartDataByModel(model),
+    }));
+  
+    setChartData({
+      labels: selectedTasks,
+      datasets: filteredChartData,
+    });
+  };
 
   // Create a function to parse the CSV data into the desired structure
   const parseCsvData = (data: Array<Object>) => {
@@ -214,73 +145,60 @@ export default function Page() {
     return parsedModelData;
   };
 
-  const updateChart = () => {
-    const data = chartData;
-    data.labels = selectedTasks;
-    data.datasets = selectedModels.map((item) => ({
-      label: item,
-      backgroundColor: Utils.chartColor(item),
-      borderColor: Utils.chartColor(item),
-      borderWidth: 1,
-      data: [1,2,3],
-    }));
-    setChartData(data);
-  }
-  
-  // // Define chart actions
-  // const actions = [
-  //   {
-  //     name: "Select Dataset(Task)",
-  //     handler(chart, taskName) {
-  //       const data = chart.data;
-  //       const dsColor = Utils.namedColor(chart.data.datasets.length);
-  //       const newDataset = {
-  //         label: taskName,
-  //         backgroundColor: dsColor,
-  //         borderColor: dsColor,
-  //         borderWidth: 1,
-  //         data: completeData.filter((item) => item.taskName === taskName).map((item) => item.score),
-  //       };
-  //       chart.data.datasets.push(newDataset);
-  //       chart.update();
-  //     }
-  //   },
-  //   {
-  //     name: "Select Data(Model)",
-  //     handler(chart, modelName) {
-  //       const data = chart.data;
-  //       if (data.datasets.length > 0) {
-  //         data.labels = chart.data.labels.append(modelName);
-  
-  //         for (var index = 0; index < data.datasets.length; ++index) {
-  //           const taskData = completeData.filter((item) => item.taskName === data.datasets[index].label);
-  //           data.datasets[index].data.push(taskData.filter((item) => item.modelName === modelName)[0].score);
-  //         }
-  
-  //         chart.update();
-  //       }
-  //     }
-  //   },
-  //   {
-  //     name: "Deselect Dataset(Task)",
-  //     handler(chart, taskName) {
-  //       chart.data.datasets = chart.data.datasets.filter((dataset) => dataset.label !== taskName);
-  //       chart.update();
-  //     }
-  //   },
-  //   {
-  //     name: "Deselect Data(Model)",
-  //     handler(chart, modelName) {
-  //       chart.data.labels = chart.data.labels.filter((label) => label !== modelName);
-  
-  //       chart.data.datasets.forEach((dataset) => {
-  //         dataset.data = dataset.data.filter((data) => data !== modelName);
-  //       });
-  
-  //       chart.update();
-  //     }
-  //   }
-  // ];
+  // Filter chart data by model
+  const filterChartDataByModel = (modelName: string) => {
+    const filtered = filteredData.filter((item) => item.modelName === modelName);
+    const sortedData = filtered.sort((a, b) => {
+      if (a.taskName > b.taskName) return 1;
+      else return -1;
+    });
+    return sortedData.map((item) => item.score);
+  };
+
+  // Fetch the CSV data
+  useEffect(() => {
+    // Parse the CSV data and update state
+    fetch('/score.csv')
+      .then((response) => response.text())
+      .then((csvData) => {
+        Papa.parse(csvData, {
+          header: true,
+          dynamicTyping: true,
+          complete: (result) => {
+            // Process the parsed data (result.data) and store it in state
+            const parsedData = result.data;
+            const taskNames = Object.keys(parsedData[0] as object);
+            setTaskNames(taskNames);
+            setCompleteData(parseCsvData(parsedData as Array<Object>));
+          },
+        });
+      });
+  }, []);
+
+  // Filter the data by selected models
+  useEffect(() => {
+    // order selected models by name
+    setSelectedModels(selectedModels.sort());
+    setFilteredData(
+      completeData.filter((item) => selectedModels.includes(item.modelName))
+    );
+    updateChartData();
+  }, [selectedModels]);
+
+  // Filter the data by selected tasks
+  useEffect(() => {
+    setSelectedTasks(selectedTasks.sort());
+    setFilteredData(
+      completeData.filter((item) => selectedTasks.includes(item.taskName))
+    );
+    updateChartData();
+  }, [selectedTasks]);
+
+  // Update the chart data when the filtered data changes
+  useEffect(() => {
+    updateChartData();
+  }, [filteredData, selectedTasks, selectedModels]);
+
 
   return (
     <PageLayout>
@@ -320,10 +238,11 @@ export default function Page() {
 
 
 /** 
- * TODO: 
+ * 
  * 1. Connect to source data and parse it to desired format
  * 2. Make chart responsive by task and model
  * 3. Create selections for tasks and models -> chakra ui checkboxes
+ * TODO: 
  * 4. Create radar charts for each model -> task score max to 100
  * 5. Create a table for each task, recommending the top 3 models
  */
