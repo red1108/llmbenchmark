@@ -84,16 +84,24 @@ export function DataTable<Data extends object>({
                 );
               }
               let fontWeight = "normal";
+              let fontColor = "black"
               console.log(val, typeof val);
               if(val[val.length-1] == ".") {
                 val = val.substring(0, val.length-1);
                 fontWeight = "bold";
+                fontColor = "red.400"
+              } else if(val[val.length-1] == "*") {
+                val = val.substring(0, val.length-1);
+                fontWeight = "bold";
+                fontColor = "blue.400"
               }
+
               return (
                 <Td
                   key={cell.id}
                   isNumeric={meta?.isNumeric}
                   fontWeight={fontWeight}
+                  color = {fontColor}
                 >
                   {val}
                 </Td>
