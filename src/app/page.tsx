@@ -58,7 +58,7 @@ export default function Home() {
           for (let j = 0; j < results.data[i].length; j++) {
             let Num = Number(results.data[i][j]);
             if(Number.isNaN(Num)) obj[results.data[0][j].replace(".","-")] = results.data[i][j];
-            if (Num == MAX) obj[results.data[0][j].replace(".","-")] = ""+Num+".";
+            else if (Num == MAX) obj[results.data[0][j].replace(".","-")] = ""+Num+".";
             else if(Num == secondMAX) obj[results.data[0][j].replace(".","-")] = ""+Num+"*";
             else obj[results.data[0][j].replace(".","-")] = ""+Num;
           }
