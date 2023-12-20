@@ -1,31 +1,37 @@
 "use client";
-import { Box, Stack, Wrap, Checkbox, CheckboxGroup } from "@chakra-ui/react";
+import { Box, Stack, Wrap, Checkbox, Tabs, TabList, Tab, TabPanels, TabPanel, Select } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import Papa from "papaparse";
 import {
-    Chart as ChartJS,
+    Chart as Chart,
     CategoryScale,
     LinearScale,
     BarElement,
     Title,
     Tooltip,
     Legend,
+    RadialLinearScale,
+    PointElement,
+    LineElement,
 } from 'chart.js';
-import { Bar } from 'react-chartjs-2';
+import { Bar, Radar } from 'react-chartjs-2';
 import { faker } from '@faker-js/faker';
 import { useEffect, useState } from "react";
-  
 
-ChartJS.register(
+Chart.register(
     CategoryScale,
     LinearScale,
+    RadialLinearScale,
+    PointElement,
+    LineElement,
     BarElement,
     Title,
     Tooltip,
-    Legend
+    Legend,
 );
-  
-export const options = {
+
+// Chart.js options for bar chart
+export const barOptions = {
   responsive: true,
   plugins: {
     legend: {
@@ -33,12 +39,11 @@ export const options = {
     },
     title: {
       display: true,
-      text: 'Chart.js Bar Chart',
+      text: 'Scores by Model',
     },
   },
 };
   
-const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
 const CHART_COLORS = {
   red: "rgb(255, 99, 132)",
   orange: "rgb(255, 159, 64)",
@@ -88,21 +93,49 @@ type Score = {
 };
 
 export default function Page() {
+  // bar chart variables
   const [modelNames, setModelNames] = useState<string[]>(["kullm12.8b","kullm5.8b","gpt-3.5-turbo","ko_vicuna_7b","llama2_13b"]);
   const [taskNames, setTaskNames] = useState<string[]>(["ko_quiz_1", "ko_quiz_2","ko_quiz_3", "ko_quiz_4", "ko_quiz_5", "ko_quiz_6", "ko_quiz_7", "number_1", "number_2", "number_3", "reasoning", "spelling_correct", "summarization", "translation"]);
   const [completeData, setCompleteData] = useState<Score[]>([]);
   const [selectedModels, setSelectedModels] = useState<string[]>(modelNames);
   const [selectedTasks, setSelectedTasks] = useState<string[]>(taskNames);
   const [filteredData, setFilteredData] = useState<Score[]>([]);
-
-  // Data for the chart
-  const [chartData, setChartData] = useState({
+  // Data for the bar chart
+  const [barChartData, setBarChartData] = useState({
     labels: taskNames,
     datasets:[{}],
   });
 
-  const updateChartData = () => {
-    const filteredChartData = selectedModels.map((model) => ({
+  // radar chart variables
+  const [selectedRadarModel, setSelectedRadarModel] = useState<string>("kullm12.8b");
+  // Data for the radar chart
+  const [radarConfig, setRadarConfig] = useState({
+      type: 'radar',
+      data: {
+        labels: ["ko_quiz_1", "ko_quiz_2","ko_quiz_3", "ko_quiz_4", "ko_quiz_5", "ko_quiz_6", "ko_quiz_7", "number_1", "number_2", "number_3", "reasoning", "spelling_correct", "summarization", "translation"],
+        datasets: [{
+          label: 'kullm12.8b',
+          data: [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 80, 50, 50, 50],
+          fill: true,
+          backgroundColor: Utils.chartColor("kullm12.8b"),
+          borderColor: Utils.chartColor("kullm12.8b"),
+          pointBackgroundColor: Utils.chartColor("kullm12.8b"),
+          pointBorderColor: '#fff',
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: Utils.chartColor("kullm12.8b")
+        }]
+      },
+      options: {
+        elements: {
+          line: {
+            borderWidth: 3
+          }
+        }
+      },
+    });
+  
+  const updateBarChartData = () => {
+    const filteredBarChartData = selectedModels.map((model) => ({
       label: model,
       backgroundColor: Utils.chartColor(model),
       borderColor: Utils.chartColor(model),
@@ -110,11 +143,40 @@ export default function Page() {
       data: filterChartDataByModel(model),
     }));
   
-    setChartData({
+    setBarChartData({
       labels: selectedTasks,
-      datasets: filteredChartData,
+      datasets: filteredBarChartData,
     });
   };
+
+  const updateRadarChartData = () => {
+    const filteredRadarChartData = {
+      labels: taskNames,
+      datasets: [{
+        label: selectedRadarModel,
+        data: filterChartDataByModel(selectedRadarModel),
+        fill: true,
+        backgroundColor: Utils.chartColor(selectedRadarModel),
+        borderColor: Utils.chartColor(selectedRadarModel),
+        pointBackgroundColor: Utils.chartColor(selectedRadarModel),
+        pointBorderColor: '#fff',
+        pointHoverBackgroundColor: '#fff',
+        pointHoverBorderColor: Utils.chartColor(selectedRadarModel)
+      }]
+    }
+  
+    setRadarConfig({
+      type: 'radar',
+      data: filteredRadarChartData,
+      options: {
+        elements: {
+          line: {
+            borderWidth: 3
+          }
+        }
+      },
+    });
+  }
 
   // Create a function to parse the CSV data into the desired structure
   const parseCsvData = (data: Array<Object>) => {
@@ -182,7 +244,7 @@ export default function Page() {
     setFilteredData(
       completeData.filter((item) => selectedModels.includes(item.modelName))
     );
-    updateChartData();
+    updateBarChartData();
   }, [selectedModels]);
 
   // Filter the data by selected tasks
@@ -191,46 +253,80 @@ export default function Page() {
     setFilteredData(
       completeData.filter((item) => selectedTasks.includes(item.taskName))
     );
-    updateChartData();
+    updateBarChartData();
   }, [selectedTasks]);
 
   // Update the chart data when the filtered data changes
   useEffect(() => {
-    updateChartData();
+    updateBarChartData();
   }, [filteredData, selectedTasks, selectedModels]);
 
+  // Update the radar chart data when the selected model changes
+  useEffect(() => {
+    updateRadarChartData();
+  }, [selectedRadarModel, completeData]);
 
   return (
     <PageLayout>
-      <Box p="50px">
-        <Stack spacing={[1, 5]} direction={['column', 'row']}>
-          {modelNames.map((modelName) => (
-            <Checkbox
-            defaultChecked={true}
-            value={modelName} 
-            key={modelName}
-            onChange={(e) => {setSelectedModels(
-              selectedModels.includes(modelName)
-              ? selectedModels.filter((item) => item !== modelName)
-              : selectedModels.concat(modelName)
-              )}}
-            >{modelName}</Checkbox>
-          ))}
-        </Stack>
-        <Wrap spacing = '5px'>
-          {taskNames.map((taskName) => (
-            <Checkbox value={taskName}
-            defaultChecked={true}
-            key={taskName}
-            onChange = {(e) => {setSelectedTasks(
-              selectedTasks.includes(taskName)
-              ? selectedTasks.filter((item) => item !== taskName)
-              : selectedTasks.concat(taskName)
-              )}}
-            >{taskName}</Checkbox>
-          ))}
-        </Wrap>
-        <Bar options={options} data={chartData} />
+      <Box p="70px">
+        <Tabs colorScheme="black">
+          <TabList>
+            <Tab>
+              Chart
+            </Tab>
+            <Tab>
+              Model Skills
+            </Tab>
+            <Tab>
+              Model Recommendations
+            </Tab>
+          </TabList> 
+          <TabPanels>
+            <TabPanel>
+              <Stack spacing={[1, 5]} direction={['column', 'row']}>
+                {modelNames.map((modelName) => (
+                  <Checkbox
+                  defaultChecked={true}
+                  value={modelName} 
+                  key={modelName}
+                  onChange={(e) => {setSelectedModels(
+                    selectedModels.includes(modelName)
+                    ? selectedModels.filter((item) => item !== modelName)
+                    : selectedModels.concat(modelName)
+                    )}}
+                  >{modelName}</Checkbox>
+                ))}
+              </Stack>
+              <Wrap spacing = '5px'>
+                {taskNames.map((taskName) => (
+                  <Checkbox value={taskName}
+                  defaultChecked={true}
+                  key={taskName}
+                  onChange = {(e) => {setSelectedTasks(
+                    selectedTasks.includes(taskName)
+                    ? selectedTasks.filter((item) => item !== taskName)
+                    : selectedTasks.concat(taskName)
+                    )}}
+                  >{taskName}</Checkbox>
+                ))}
+              </Wrap>
+              <Bar options={barOptions} data={barChartData} />
+            </TabPanel>
+            <TabPanel>
+              <Select 
+              variant='flushed' 
+              placeholder='Select Model' 
+              onChange={(e) => {
+                setSelectedRadarModel(e.target.value);
+              }}>
+                {modelNames.map((modelName) => (
+                  <option value={modelName} key={modelName}>{modelName}</option>
+                ))}
+              </Select>
+              <Radar data={radarConfig.data} options={radarConfig.options} />
+            </TabPanel>
+          </TabPanels>     
+        </Tabs>
       </Box>
     </PageLayout>
   );
@@ -245,4 +341,5 @@ export default function Page() {
  * TODO: 
  * 4. Create radar charts for each model -> task score max to 100
  * 5. Create a table for each task, recommending the top 3 models
+ * 6. Create group of selections for the tasks and models for group comparison
  */
