@@ -144,6 +144,7 @@ export default function Page() {
         maintainAspectRatio: false,
       },
     });
+
     // Data for the rank radar chart
   const [rankRadarConfig, setRankRadarConfig] = useState({
     type: "radar",
@@ -171,25 +172,35 @@ export default function Page() {
       },
       scales: {
         r: {
-            angleLines: {
-                display: false
-            },
-            suggestedMin: 0,
-            suggestedMax: 10
+          reverse: true,
+          angleLines: {
+              display: false
+          },
+          suggestedMin: 0,
+          suggestedMax: 8
         }
       },
       maintainAspectRatio: false,
     },
   });
-  // Function to calculate the rank for each task
-  const calculateModelRank = (modelName: string) => {
-    const modelData = completeData.filter((item) => item.modelName === modelName);
-    const sortedData = [...modelData].sort((a, b) => b.score - a.score);
-    const ranks: number[] = [];
-    for (const task of taskNames) {
-      const rank = sortedData.findIndex((item) => item.taskName === task) + 1;
-      ranks.push(rank);
-    }
+
+  // Calculate the rank of a model for each task
+  const calculateModelRank = (modelName: string): number[] => {
+    const ranks = taskNames.map((taskName) => {
+      const scoresForTask = completeData
+        .filter((score) => score.taskName === taskName)
+        .map((score) => ({
+          modelName: score.modelName,
+          score: score.score,
+        }));
+      scoresForTask.sort((a, b) => b.score - a.score);
+  
+      // Find the index (rank) of the selected model
+      const modelRank = scoresForTask.findIndex((score) => score.modelName === modelName) + 1;
+  
+      return modelRank;
+    });
+  
     return ranks;
   };
   
@@ -266,11 +277,12 @@ export default function Page() {
         },
         scales: {
           r: {
+              reverse: true,
               angleLines: {
                   display: false
               },
               suggestedMin: 0,
-              suggestedMax: 10
+              suggestedMax: 8
           }
         },
         maintainAspectRatio: false,
