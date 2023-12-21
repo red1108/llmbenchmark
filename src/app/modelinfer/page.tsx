@@ -166,7 +166,7 @@ export default function Page() {
             let newResult = [...result];
             newResult[i].result = res.choices[0].message.content;
             newResult[i].ready = true;
-            //setResult(newResult);
+            setResult(newResult);
           })
           .catch((error) => console.log("openai error : ", error));
       } else if (result[i].modelName === "kullm-5.8b") {
@@ -176,7 +176,7 @@ export default function Page() {
             console.log(res.choices[0].text);
             newResult[i].result = res.choices[0].text;
             newResult[i].ready = true;
-            console.log("alive");
+            setResult(newResult);
           })
           .catch((error) => console.log("kullm error : ", error));
       } else if(result[i].modelName === "gemini-pro") {
@@ -185,6 +185,7 @@ export default function Page() {
             let newResult = [...result];
             newResult[i].result = res;
             newResult[i].ready = true;
+            setResult(newResult);
           })
           .catch((error) => console.log("gemini error : ", error));
       }
