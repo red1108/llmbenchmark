@@ -107,11 +107,14 @@ export default function Page() {
       .catch((error) => toast({ description: error }));
   };
 
+  const inferGemini = (prompt: string) => {
+    //TODO: 구현하기
+  };
+
   const inferKullm = (prompt: string) => {
     const data = JSON.stringify({
       model: "nlpai-lab/kullm-polyglot-5.8b-v2",
-      prompt:
-        `아래는 작업을 설명하는 명령어입니다. 요청을 적절히 완료하는 응답을 작성하세요.\n\n### 명령어:\n${prompt}\n\n### 응답:\n`,
+      prompt: `아래는 작업을 설명하는 명령어입니다. 요청을 적절히 완료하는 응답을 작성하세요.\n\n### 명령어:\n${prompt}\n\n### 응답:\n`,
       max_tokens: 1024,
       temperature: 0,
     });
@@ -119,15 +122,18 @@ export default function Page() {
     return fetch("http://polaris.snu.ac.kr:8123/v1/completions", {
       method: "POST",
       headers: {
-        "content-type": "application/json"
+        "content-type": "application/json",
       },
       body: data,
     })
       .then((response) => response.json())
-      .catch((error) =>  {
-          toast({ description: "polaris.snu.ac.kr:8123 model nlpai-lab/kullm-polyglot-5.8b-v2 not found", status:"error"});
-        }
-      );
+      .catch((error) => {
+        toast({
+          description:
+            "polaris.snu.ac.kr:8123 model nlpai-lab/kullm-polyglot-5.8b-v2 not found",
+          status: "error",
+        });
+      });
   };
 
   const handleSubmit = (event: any) => {
@@ -151,12 +157,9 @@ export default function Page() {
       duration: 2000,
       isClosable: true,
     });
-    
+
     for (let i = 0; i < result.length; i++) {
-      if (
-        result[i].modelName === "gpt-3.5-turbo" ||
-        result[i].modelName === "GPT-4"
-      ) {
+      if (result[i].modelName === "gpt-3.5-turbo") {
         inferOpenAI(modelNameAPIMapper[result[i].modelName], msg)
           .then((res) => {
             let newResult = [...result];
@@ -175,9 +178,10 @@ export default function Page() {
             console.log("alive");
           })
           .catch((error) => console.log("kullm error : ", error));
+      } else if(result[i].modelName === "gemini-pro") {
+        //TODO:
       }
     }
-
   };
 
   return (
