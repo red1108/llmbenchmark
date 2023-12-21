@@ -26,19 +26,13 @@ type ModelResultType = {
 
 const initialModelResult: ModelResultType[] = [
   {
-    modelName: "GPT-3",
-    badgeColor: "blue",
-    result: "ㅤ",
-    ready: true,
-  },
-  {
     modelName: "gpt-3.5-turbo",
     badgeColor: "blue",
     result: "ㅤ",
     ready: true,
   },
   {
-    modelName: "GPT-4",
+    modelName: "gemini-pro",
     badgeColor: "green",
     result: "ㅤ",
     ready: true,
@@ -78,6 +72,7 @@ const initialModelResult: ModelResultType[] = [
 const modelNameAPIMapper: { [id: string]: string } = {
   "gpt-3.5-turbo": "gpt-3.5-turbo",
   "GPT-4": "gpt-4",
+  "gemini-pro": "gemini-pro",
 };
 
 export default function Page() {
@@ -99,7 +94,7 @@ export default function Page() {
       headers: {
         "content-type": "application/json",
         Authorization:
-          "Bearer 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", //+process.env.OPENAI_API_KEY,
+          "Bearer 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", //+process.env.OPENAI_API_KEY,
       },
       body: data,
     })
@@ -107,8 +102,14 @@ export default function Page() {
       .catch((error) => toast({ description: error }));
   };
 
-  const inferGemini = (prompt: string) => {
-    //TODO: 구현하기
+  const inferGemini = async (prompt: string) => {
+    const { GoogleGenerativeAI } = require("@google/generative-ai"); 
+    const genAI = new GoogleGenerativeAI("AIzaSyCXLO8hcnNrkIqlmMeNHRZOFKGXwHYWYIM");
+    const model = genAI.getGenerativeModel({model:"gemini-pro"});
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const text = response.text();
+    return text;
   };
 
   const inferKullm = (prompt: string) => {
@@ -179,7 +180,13 @@ export default function Page() {
           })
           .catch((error) => console.log("kullm error : ", error));
       } else if(result[i].modelName === "gemini-pro") {
-        //TODO:
+        inferGemini(msg)
+          .then((res) => {
+            let newResult = [...result];
+            newResult[i].result = res;
+            newResult[i].ready = true;
+          })
+          .catch((error) => console.log("gemini error : ", error));
       }
     }
   };
