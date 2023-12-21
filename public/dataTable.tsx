@@ -92,7 +92,7 @@ export function DataTable<Data extends object>({
                 fontColor = "red.400"
               } else if(val[val.length-1] == "*") {
                 val = val.substring(0, val.length-1);
-                fontWeight = "normal";
+                fontWeight = "bold";
                 fontColor = "blue.400"
               }
 
