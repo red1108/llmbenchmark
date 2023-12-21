@@ -60,6 +60,10 @@ const modelNameMapper: {[key:string]:string} = {
     "kullm5.8b": "kullm-5.8b",
     "kullm12.8b": "kullm-12.8b",
     "llama2_13b": "llama2-ko-13b",
+    "gemini-pro": "gemini-pro",
+    "ko_vicuna_7b": "ko_vicuna_7b",
+    "KoAlpaca-Polyglot-5.8B": "koalpaca-5.8B",
+    "polyglot-ko-1.3b": "polyglot-ko-1.3b"
 }
 
 const badgeColorMapper: {[key:string]:string} = {
@@ -67,6 +71,10 @@ const badgeColorMapper: {[key:string]:string} = {
     "kullm5.8b": "green",
     "kullm12.8b": "red",
     "llama2_13b": "purple",
+    "gemini-pro": "yellow",
+    "ko_vicuna_7b": "orange",
+    "KoAlpaca-Polyglot-5.8B": "gray",
+    "polyglot-ko-1.3b": "pink"
 }
 
 type TaskType = {
@@ -109,7 +117,7 @@ export default function Page() {
     
     /* useEffect 써서 초기 데이터 불러오기 */
     const updateResult = () => {
-        Papa.parse("/result.csv", {
+        Papa.parse(`/re-sorted/${taskName}.csv`, {
             download: true,
             complete: function(results: {data:Array<Array<string>>}) {
                 const newResult : ModelResultWithScoreType[]= [];
@@ -119,8 +127,8 @@ export default function Page() {
                         newResult.push({
                             modelName: modelNameMapper[results.data[i][2]],
                             badgeColor: badgeColorMapper[results.data[i][2]],
-                            result: results.data[i].slice(4, results.data[i].length-2).join(""),
-                            score: Number(results.data[i][results.data[i].length-1]),
+                            result: results.data[i][4],
+                            score: Number(results.data[i][5]),
                             ready: true,
                         });
                         if(!flag) {
