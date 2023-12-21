@@ -6,17 +6,8 @@ import { DataTable } from "../../public/dataTable";
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 
-type UnitConversion = {
-  taskName: string;
-  gpt35turbo: number;
-  kullm58b: number;
-  kullm128b: number;
-  llama2ko128b: number;
-  kovicuna128b: number;
-};
 
-
-const columnHelper = createColumnHelper<UnitConversion>();
+const columnHelper = createColumnHelper<any>();
 
 const initialColumns = [
   columnHelper.accessor("taskName", {
