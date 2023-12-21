@@ -9,10 +9,7 @@ type ModelResultWithScoreType = {
 };
 
 const getColor = (score: number) => {
-    if (score >= 80) return "green";
-    else if(score >= 60) return "blue"
-    else if(score >= 40) return "yellow";
-    else if(score >= 20) return "orange";
+    if (score >= 1) return "green";
     else return "red";
 }
 
