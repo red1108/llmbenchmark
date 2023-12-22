@@ -29,6 +29,7 @@ export default function Page() {
                         <AccordionPanel pb={4}>
                             한국인들도 자주 헷갈려하는 한국어 어휘 및 문법에 관한 세부 태스크 8개로 구성되어 있다.
                             LLM의 한국어 구사 능력이 어느 수준인지 확인할 수 있는 태스크이다.
+                            답안에서 보기 숫자를 모두 추출한 다음 정답과 비교하여 채점하며, accuracy로 전체 태스크에 대한 점수를 매긴다.
 
                             <TableContainer bg="gray.50" borderRadius="10px" mt="20px" mb="10px">
                                 <Table variant='simple'>
@@ -52,8 +53,8 @@ export default function Page() {
                                         </Tr>
                                         <Tr>
                                             <Td>한국어 속담</Td>
-                                            <Td>불난 데서 ? 한다에서 ? 에 들어갈 단어로만 대답하시오.</Td>
-                                            <Td>불이야</Td>
+                                            <Td>닭 쫓던 개 ? 쳐다보듯에서 ? 에 들어갈 단어는? '지붕'이면 1, '마당'이면 2, '마루'이면 3이라고 대답해.</Td>
+                                            <Td>1</Td>
                                         </Tr>
                                         <Tr>
                                             <Td>단어의 유의어 찾기</Td>
@@ -97,6 +98,8 @@ export default function Page() {
                         <AccordionPanel pb={4}>
                             한국어의 수사를 얼마나 잘 알고 활용할 수 있는지를 확인하는 태스크이다.
                             숫자 12를 "십이" 또는 "열둘"로 읽는 태스크와 반대로 수사를 읽고 숫자로 변환하는 태스크로 이루어져 있다.
+                            한국어로 분수를 읽는 방법도 파악하고 있는지 확인한다.
+                            가능한 정답이 답변에 포함되어 있으면 정답으로 하여, accuracy로 태스크에 대한 점수를 산정한다.
 
                             <TableContainer bg="gray.50" borderRadius="10px" mt="20px" mb="10px">
                                 <Table variant='simple'>
@@ -118,6 +121,11 @@ export default function Page() {
                                             <Td>"구"를 수로 변환해서 대답해. 다른 글자, 문장은 아무것도 대답하지 말고 정답 수 하나만 출력해.</Td>
                                             <Td>9</Td>
                                         </Tr>
+                                        <Tr>
+                                            <Td>한국어 분수 표현 이해</Td>
+                                            <Td>3분의 7을 수로 바꾸어서 출력해줘</Td>
+                                            <Td>7/3</Td>
+                                        </Tr>
                                     </Tbody>
                                 </Table>
                             </TableContainer>
@@ -135,6 +143,7 @@ export default function Page() {
                         <AccordionPanel pb={4}>
                             맞춤법이 틀린 문장을 읽고 올바르게 교정하는 태스크이다.
                             LLM이 한국어 어휘와 문법을 얼마나 잘 이해하는지를 종합적으로 판단하기 위해 제작하였다.
+                            원래의 문장과 고쳐진 문장에서 어떤 부분이 교정되었는지를 모두 확인하여 F_0.5 score를 계산한다.
 
                             <TableContainer bg="gray.50" borderRadius="10px" mt="20px" mb="10px">
                                 <Table variant='simple'>
@@ -168,6 +177,7 @@ export default function Page() {
                         <AccordionPanel pb={4}>
                             주어진 두 문장 사이의 관계를 '서로 일치한다', '서로 모순된다', '서로 관련이 없다' 중에서 파악하는 태스크이다.
                             문장이 내포하고 있는 의미를 분석한 후 비교하는 능력을 검증한다.
+                            객관식 문제이므로 정답에서 보기 숫자를 추출하여 정답 여부를 판정하고, accuracy를 계산한다.
 
                             <TableContainer bg="gray.50" borderRadius="10px" mt="20px" mb="10px">
                                 <Table variant='simple'>
@@ -204,6 +214,7 @@ export default function Page() {
                             긴 글을 읽은 후 그 정보를 바탕으로 질문에 답하는 태스크이다.
                             주어진 내용을 이해하고 주어진 정보를 탐색할 수 있는 능력을 확인할 수 있다.
                             글 속에서 질문의 답을 찾을 수 없는 경우도 있으며, 이때는 예상 답안을 출력하면 틀린 것으로 처리한다.
+                            Accuracy를 이용하여 점수를 산정한다.
 
                             <TableContainer bg="gray.50" borderRadius="10px" mt="20px" mb="10px">
                                 <Table variant='simple'>
