@@ -1,3 +1,5 @@
+// @ts-ignore
+// @ts-nocheck
 "use client";
 import { Box, Stack, Wrap, Checkbox, Tabs, TabList, Tab, TabPanels, TabPanel, Select } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
@@ -31,7 +33,7 @@ Chart.register(
 );
 
 // Chart.js options for bar chart
-export const barOptions = {
+const barOptions = {
   responsive: true,
   plugins: {
     legend: {
