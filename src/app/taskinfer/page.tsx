@@ -264,7 +264,7 @@ export default function Page() {
                         })}
                     </Select>
                     <Spacer />
-                    <Select placeholder="0" w="250px" maxW="15vw" onChange={(e: any) => { e.preventDefault(); console.log(e.target.value); setTaskNumber(Number(e.target.value)); }}>
+                    <Select placeholder="1" w="250px" maxW="15vw" onChange={(e: any) => { e.preventDefault(); console.log(e.target.value); setTaskNumber(Number(e.target.value)); }}>
                         {[...Array(taskSize - 1)].map((_, i) => {
                             return (
                                 <option value={i + 1} key={i + 1}>{i + 1}</option>
