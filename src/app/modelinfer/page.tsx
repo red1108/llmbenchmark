@@ -44,26 +44,20 @@ const initialModelResult: ModelResultType[] = [
     ready: true,
   },
   {
+    modelName: "kullm-12.8b",
+    badgeColor: "orange",
+    result: "ㅤ",
+    ready: true,
+  },
+  {
     modelName: "llama2-ko-13b",
     badgeColor: "red",
     result: "ㅤ",
     ready: true,
   },
   {
-    modelName: "ko-alpaca",
-    badgeColor: "purple",
-    result: "ㅤ",
-    ready: true,
-  },
-  {
     modelName: "ko-vicuna-7b",
     badgeColor: "gray",
-    result: "ㅤ",
-    ready: true,
-  },
-  {
-    modelName: "polyglot-ko",
-    badgeColor: "pink",
     result: "ㅤ",
     ready: true,
   },
@@ -163,7 +157,7 @@ export default function Page() {
 
   const inferLlama = (prompt: string) => {
     const data = JSON.stringify({
-      model: "junelee/ko_vicuna_7b",
+      model: "etri-xainlp/llama2-ko-13b-instruct",
       prompt: `### 사용자:\n${prompt}\n\n### AI:`,
       max_tokens: 256,
       temperature: 0,
@@ -178,6 +172,29 @@ export default function Page() {
     })
       .then((response) => response.json()).catch((error) => {
         console.log("llama2 error", error);
+      });
+  };
+
+
+
+  const inferKullm128 = (prompt: string) => {
+    const data = JSON.stringify({
+      model: "nlpai-lab/kullm-polyglot-12.8b-v2",
+      prompt: `아래는 작업을 설명하는 명령어입니다. 요청을 적절히 완료하는 응답을 작성하세요.\n\n### 명령어:\n${prompt}\n\n### 응답:\n`,
+      max_tokens: 1024,
+      temperature: 0,
+    });
+
+    return fetch("http://147.46.15.250:2000/v1/completions", {
+      method: "POST",
+      headers: {
+        "content-type": "application/json",
+      },
+      body: data,
+    })
+      .then((response) => response.json())
+      .catch((error) => {
+        console.log("kullm 12.8b error:", error);
       });
   };
 
@@ -252,6 +269,15 @@ export default function Page() {
             setResult(newResult);
           })
           .catch((error) => console.log("llama2-ko-13b : ", error));
+      } else if (result[i].modelName === "kullm-12.8b") {
+        inferKullm128(msg)
+          .then((res) => {
+            let newResult = [...result];
+            newResult[i].result = res.choices[0].text;
+            newResult[i].ready = true;
+            setResult(newResult);
+          })
+          .catch((error) => console.log("kullm12.8b : ", error));
       }
     }
   };
