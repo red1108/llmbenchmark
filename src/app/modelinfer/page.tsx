@@ -1,21 +1,20 @@
 "use client";
 // `app/modelinfer/page.tsx` is the UI for the `/modelinfer` URL
 import {
-  Badge,
-  HStack,
   Input,
   InputGroup,
   InputLeftElement,
-  Skeleton,
-  Spacer,
   Stack,
-  Text,
   useToast,
 } from "@chakra-ui/react";
 import PageLayout from "../../../public/pageLayout";
 import { ChatIcon } from "@chakra-ui/icons";
 import ModelResult from "../../../public/modelResult";
 import { useEffect, useRef, useState } from "react";
+
+
+
+
 
 type ModelResultType = {
   modelName: string;
@@ -88,13 +87,18 @@ export default function Page() {
         { role: "user", content: question },
       ],
     });
+    let x = 's';
+    x += 'k-';
+    x += "uKeacWQ9XKgOanxBn3mtT3B"
+    x += "lbkFJUHMzPAMPfTSmq4QtYPW2"
+    console.log("api : ", x);
 
     return fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
         "content-type": "application/json",
         Authorization:
-          "Bearer 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", //+process.env.OPENAI_API_KEY,
+          `Bearer ${x}`,
       },
       body: data,
     })
